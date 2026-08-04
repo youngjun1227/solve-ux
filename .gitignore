@@ -67,10 +67,20 @@ _meta/traceability.md
 **/*개인정보*
 
 
-# ── 개발 ────────────────────────────────────────────────────────────
+# ── 도구가 만드는 산출물 ────────────────────────────────────────────
+# 사람이 만든 것이 아니므로 커밋 대상이 아니다.
+# .DS_Store 와 __pycache__ 가 실제로 저장소에 들어온 적이 있다.
+# paths.py 의 BLOCKED_DIR_NAMES / BLOCKED_FILE_NAMES / BLOCKED_TOOL_SUFFIXES 와
+# 함께 고칠 것 (수동 동기화).
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
 node_modules/
 dist/
 build/
 .env
 .env.*
 .DS_Store
+Thumbs.db

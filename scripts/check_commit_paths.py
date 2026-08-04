@@ -39,7 +39,10 @@ def main(argv):
         targets = argv
         label = "지정한 경로"
     else:
-        targets = git("diff", "--cached", "--name-only")
+        # --diff-filter=d 로 삭제를 뺀다. 삭제되는 파일은 커밋되는 것이 아니라
+        # 저장소에서 빠지는 것이므로 차단 대상이 아니다. 이걸 빼지 않으면
+        # __pycache__ 를 지우는 커밋이 "커밋하면 안 되는 파일"로 잡힌다.
+        targets = git("diff", "--cached", "--name-only", "--diff-filter=d")
         label = "staged 파일"
 
     if not targets:

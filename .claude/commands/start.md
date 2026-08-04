@@ -17,12 +17,17 @@ git pull --rebase
 
 ## 2. 목록 다시 만들기
 
+`01_evidence/index.csv`는 저장소에 올라가지 않는 파일이라 clone 직후에는 없다.
+매번 여기서 다시 만든다.
+
+**스크립트가 아직 없을 수 있으므로 반드시 아래 형태로 실행한다.**
+파일이 없을 때 파이썬 에러 메시지가 그대로 튀어나오면 안 된다.
+
 ```
-python3 scripts/build_index.py
+[ -f scripts/build_index.py ] && python3 scripts/build_index.py || echo "(카드 목록 만들기는 아직 준비 중입니다 — 건너뜁니다)"
 ```
 
-`01_evidence/index.csv`는 저장소에 올라가지 않는 파일이라 clone 직후에는 없다.
-매번 여기서 다시 만든다. 스크립트가 아직 없으면 이 단계는 건너뛰고 넘어간다.
+`python3 scripts/build_index.py`를 그냥 실행하지 마라.
 
 ## 3. 그동안 뭐가 바뀌었는지 요약
 

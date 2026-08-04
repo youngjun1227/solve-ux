@@ -38,6 +38,15 @@ GENERATED = {
 # 2차 방어선 — 화이트리스트 밖 폴더에 실수로 저장한 녹화·녹음.
 BLOCKED_SUFFIXES = {".mp4", ".mov", ".avi", ".m4a", ".mp3", ".wav"}
 
+# 도구가 자동으로 만드는 산출물. 사람이 만든 것이 아니므로 커밋 대상이 아니다.
+# .DS_Store 와 __pycache__ 가 실제로 이렇게 저장소에 들어온 적이 있다.
+# .gitignore 는 이미 추적 중인 파일을 막지 못하므로 여기서도 잡는다.
+BLOCKED_DIR_NAMES = {"__pycache__", "node_modules", "dist", "build", ".venv", ".pytest_cache"}
+BLOCKED_FILE_NAMES = {".DS_Store", "Thumbs.db"}
+# 비밀값 파일. .env, .env.local 등 .env 로 시작하는 것 전부.
+BLOCKED_NAME_PREFIXES = (".env",)
+BLOCKED_TOOL_SUFFIXES = {".pyc", ".pyo"}
+
 # 3차 방어선 — 파일명 패턴. 이름을 바꾸면 뚫리므로 이것만 믿지 않는다.
 BLOCKED_NAME_SUBSTRINGS = ("contacts", "연락처", "participants", "응답자", "개인정보")
 
@@ -47,7 +56,9 @@ BLOCK = "BLOCK"
 
 def classify(path: str):
     """경로 하나를 판정한다. (verdict, reason) 을 돌려준다."""
-    p = path.replace("\\", "/").lstrip("./")
+    # removeprefix 를 쓴다. lstrip("./") 는 dotfile 의 앞 점까지 지운다
+    # (".DS_Store" -> "DS_Store", ".env" -> "env") — 실제로 이 버그가 있었다.
+    p = path.replace("\\", "/").removeprefix("./")
     parts = [x for x in p.split("/") if x]
     if not parts:
         return BLOCK, "빈 경로"
@@ -56,6 +67,21 @@ def classify(path: str):
 
     if p in GENERATED:
         return BLOCK, f"자동 생성물 — 커밋 대상이 아니다 ({p})"
+
+    if name in BLOCKED_FILE_NAMES:
+        return BLOCK, f"도구가 만든 파일 ({name}) — 커밋 대상이 아니다"
+
+    for pre in BLOCKED_NAME_PREFIXES:
+        if name.startswith(pre):
+            return BLOCK, f"비밀값이 들어갈 수 있는 파일 ({name}) — 커밋 대상이 아니다"
+
+    for d in parts[:-1]:
+        if d in BLOCKED_DIR_NAMES:
+            return BLOCK, f"도구가 만든 폴더 ({d}/) — 커밋 대상이 아니다"
+
+    for suf in BLOCKED_TOOL_SUFFIXES:
+        if lower.endswith(suf):
+            return BLOCK, f"빌드 산출물 ({suf}) — 커밋 대상이 아니다"
 
     for suf in BLOCKED_SUFFIXES:
         if lower.endswith(suf):
