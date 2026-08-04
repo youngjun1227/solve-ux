@@ -3,6 +3,15 @@
 # 설계 원칙: 개인정보가 들어올 수 있는 폴더는 "차단 후 허용"(화이트리스트)으로 쓴다.
 # 확장자·파일명 블랙리스트는 이름을 바꾸면 뚫리므로 보조 수단으로만 쓴다.
 # 근거: 00_project/architecture_review.md 뿌리 ③
+#
+# ⚠️ 이 파일은 화이트리스트의 정의처가 아니다.
+#    정의처는 scripts/paths.py 하나이고, 실제 방어는 scripts/check_commit_paths.py 가 한다.
+#    .gitignore 는 파이썬을 import 할 수 없으므로 아래 내용은 paths.py 의 사본이며
+#    **수동 동기화 대상**이다. paths.py 의 RESTRICTED_ROOTS / BLOCKED_SUFFIXES /
+#    BLOCKED_NAME_SUBSTRINGS / GENERATED 를 고치면 이 파일도 함께 고쳐야 한다.
+#
+#    또한 .gitignore 는 이미 추적 중인 파일을 막지 못한다(1차 방어선일 뿐).
+#    그래서 커밋 전 경로 대조가 반드시 필요하다.
 
 
 # ── 03_validation/ — 설문 (화이트리스트) ────────────────────────────
