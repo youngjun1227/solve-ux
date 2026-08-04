@@ -17,6 +17,7 @@ RESTRICTED_ROOTS / BLOCKED_SUFFIXES / BLOCKED_NAME_SUBSTRINGS / GENERATED 를
   이 파일 + 검사 스크립트 = 실제 방어선. 커밋 대상 경로를 직접 대조하므로
                         추적 여부와 무관하게 걸러낸다.
 """
+import unicodedata
 
 # 개인정보가 들어올 수 있어 "차단 후 허용"으로 운영하는 폴더.
 # 값에 없는 하위 폴더는 전부 커밋 금지.
@@ -53,12 +54,27 @@ BLOCKED_NAME_SUBSTRINGS = ("contacts", "연락처", "participants", "응답자",
 ALLOW = "ALLOW"
 BLOCK = "BLOCK"
 
+# 의도된 차단 / 실수로 보이는 차단
+EXPECTED = "EXPECTED"
+MISTAKE = "MISTAKE"
 
-def classify(path: str):
-    """경로 하나를 판정한다. (verdict, reason) 을 돌려준다."""
+
+def normalize(path: str) -> str:
+    """경로를 비교 가능한 형태로 만든다.
+
+    NFC 정규화가 필요한 이유: macOS 는 파일명을 자소가 분리된 NFD 로 저장한다.
+    같은 "연락처"라도 NFD 와 NFC 는 다른 문자열이라 단순 비교가 실패한다.
+    팀에 맥 사용자가 있으면 실제로 생기는 문제다.
+    """
     # removeprefix 를 쓴다. lstrip("./") 는 dotfile 의 앞 점까지 지운다
     # (".DS_Store" -> "DS_Store", ".env" -> "env") — 실제로 이 버그가 있었다.
     p = path.replace("\\", "/").removeprefix("./")
+    return unicodedata.normalize("NFC", p)
+
+
+def classify(path: str):
+    """경로 하나를 판정한다. (verdict, reason) 을 돌려준다."""
+    p = normalize(path)
     parts = [x for x in p.split("/") if x]
     if not parts:
         return BLOCK, "빈 경로"
@@ -118,3 +134,41 @@ def check(paths):
         verdict, reason = classify(path)
         (allowed if verdict == ALLOW else blocked).append((path, reason))
     return blocked, allowed
+
+
+def explain_ignored(path: str):
+    """저장소에 올라가지 않는 파일을 사람에게 어떻게 설명할지 정한다.
+
+    (분류, 설명, 옮길 곳) 을 돌려준다. 옮길 곳이 없으면 None.
+
+    두 경우를 구분해야 한다.
+      EXPECTED — 원래 안 올라가는 것이 맞다. 안심시켜야 한다.
+      MISTAKE  — 사람이 만든 파일이 엉뚱한 위치에 있다. 그대로 두면
+                 본인은 저장했다고 생각하는데 파일이 사라진다.
+    """
+    p = normalize(path)
+    parts = [x for x in p.split("/") if x]
+    if not parts:
+        return MISTAKE, "알 수 없는 경로입니다", None
+    name = parts[-1]
+    lower = name.lower()
+
+    if p in GENERATED:
+        return EXPECTED, "매번 다시 만들어지는 목록 파일입니다", None
+    if name in BLOCKED_FILE_NAMES or any(d in BLOCKED_DIR_NAMES for d in parts[:-1]):
+        return EXPECTED, "컴퓨터가 자동으로 만든 파일입니다", None
+    if any(lower.endswith(s) for s in BLOCKED_TOOL_SUFFIXES):
+        return EXPECTED, "프로그램 실행 중 자동으로 생긴 파일입니다", None
+    if any(name.startswith(pre) for pre in BLOCKED_NAME_PREFIXES):
+        return EXPECTED, "비밀값이 들어가는 설정 파일이라 올리지 않습니다", None
+    if any(lower.endswith(s) for s in BLOCKED_SUFFIXES):
+        return EXPECTED, "녹화·녹음 파일은 저장소에 올리지 않습니다", None
+
+    root = parts[0]
+    if root in RESTRICTED_ROOTS:
+        allowed = ", ".join(f"{root}/{d}/" for d in sorted(RESTRICTED_ROOTS[root]))
+        if len(parts) >= 2 and parts[1] == "raw":
+            return EXPECTED, "원본 파일이라 일부러 올리지 않습니다 (개인정보 보호)", None
+        return MISTAKE, f"{root}/ 아래에서 올릴 수 있는 곳이 아닙니다", allowed
+
+    return MISTAKE, "저장소에 올라가지 않는 위치입니다", None
