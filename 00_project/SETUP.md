@@ -252,15 +252,26 @@ Accessibility / 콘텐츠 구조
 
 | agent | tools | 쓰기 허용 경로 |
 |---|---|---|
-| `desk-researcher` | WebSearch, WebFetch, Read, Write | `01_evidence/desk/` |
-| `competitor-analyst` | Read(이미지), WebFetch, Write | `01_evidence/competitor/` |
-| `screen-analyst` | Read(이미지), Write | `01_evidence/screen/` |
+| `desk-researcher` | WebSearch, WebFetch, Read, Write, Bash | `01_evidence/desk/` |
+| `competitor-analyst` | Read, Write, Bash, Glob — **웹 도구 없음** | `01_evidence/competitor/` |
+| `screen-analyst` | Read, Write, Bash, Glob — **웹 도구 없음** | `01_evidence/screen/` |
 | `synthesizer` | Read, Grep, Glob, Write | `02_hypothesis/draft/` **만** |
 | `survey-designer` | Read, Write | `03_validation/design/` |
 | `data-analyst` | Read, Bash(python), Write | `03_validation/analysis/`, `07_usertest/analysis/` |
 | `red-team-auditor` | Read, Grep, Glob, Write | `_meta/` **만** |
 
 **쓰기 경로를 제한하는 이유:** `desk-researcher`가 실수로 `02_hypothesis/`를 덮어쓰면 추적성이 끊깁니다. 감사역은 읽기 전용에 리포트만 쓰게 해서, 자기가 지적한 걸 자기가 고치는 상황을 막습니다.
+
+**`competitor-analyst`와 `screen-analyst`에 웹 도구를 주지 않는 이유 — 중요합니다.**
+
+경쟁 앱의 실제 화면은 로그인해야 보입니다. 웹에서 찾을 수 있는 것은 마케팅 자료뿐이고,
+그것으로 "토스는 이렇게 한다"고 쓰면 그럴듯하지만 틀린 카드가 만들어집니다.
+PROJECT_PLAN W1이 순서를 뒤집은 이유가 이것입니다 — **사람이 먼저 직접 찍고, AI는
+그 캡처만 봅니다.**
+
+웹 도구를 주면 이 안전장치가 프롬프트 문구 하나에만 의존하게 됩니다.
+도구를 아예 빼면 구조가 대신 막습니다. 초안 표에는 `competitor-analyst`에 WebFetch가
+있었는데, 그대로 만들었다면 이 원칙이 무너졌을 것입니다.
 
 ### `red-team-auditor` 점검 항목 — 판단이 필요한 것만
 
@@ -301,7 +312,7 @@ Accessibility / 콘텐츠 구조
 **정본은 `scripts/traceability_check.py`입니다.** 아래 표는 목록일 뿐이며, 검사를
 추가·수정할 때는 스크립트를 고칩니다.
 
-### 검사 항목 (11개)
+### 검사 항목 (13개)
 
 | # | 검사 | 심각도 |
 |---|---|---|
@@ -316,6 +327,11 @@ Accessibility / 콘텐츠 구조
 | 9 | ID 대역 위반 — O·E·S·C·SOL만 대상. **H·P·M은 대역이 없으므로 제외** | WARN |
 | 10 | M 카드 스키마 — `solution`·`pain_point`·`metric`·`baseline`·`result` | ERROR |
 | 11 | S 카드 스키마 — `screen`·`captured` | ERROR |
+| 12 | 공통 필수 필드 — `type`·`author`·`date`·`summary` | ERROR |
+| 13 | C 카드 스키마 — `app`·`user_task`·`grade`·`capture`·`captured` | ERROR |
+
+필수 필드 목록의 정본은 `scripts/cards.py`의 `EXTRA_FIELDS`이고,
+문서 쪽 정본은 `CLAUDE.md`다. 검사 스크립트는 그 표를 읽어 쓸 뿐 목록을 따로 갖지 않는다.
 
 **#3이 필드 존재만 보지 않는 이유:** `validated_by`가 비어 있지 않기만 하면 통과하던
 초안 설계로는, 손으로 만든 P 카드가 그대로 통과합니다. 값이 실제로 있어야 합니다.

@@ -19,7 +19,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 # 카드 상수·읽기는 전부 cards.py 에 있다. 여기에 복제하지 않는다.
 from cards import (  # noqa: E402
-    ROOT, ID_RE, BANDS, BAND_EXEMPT_TYPES, card_type, load_cards,
+    ROOT, ID_RE, BANDS, BAND_EXEMPT_TYPES, COMMON_FIELDS, EXTRA_FIELDS,
+    FIELD_HINT, TYPE_CHECK_NUM, card_type, load_cards,
 )
 
 ERROR, WARN = "ERROR", "WARN"
@@ -46,21 +47,22 @@ def run_checks(cards):
             seen[cid] = p
         by_id[cid] = c
 
-        # 5 — E 카드 출처 4요소
-        if t == "E":
-            missing = [k for k in ("source_org", "published", "page") if not fm.get(k)]
-            if not (fm.get("url") or fm.get("local_file")):
-                missing.append("url 또는 local_file")
-            if missing:
-                f.append((ERROR, 5, p, f"출처 4요소 누락: {', '.join(missing)}"))
+        # 12 — 공통 필수 필드. summary 가 없으면 카드가 수백 장 됐을 때
+        # 목록만 보고는 무슨 내용인지 알 수 없다.
+        missing = [k for k in COMMON_FIELDS if k != "id" and not fm.get(k)]
+        if missing:
+            f.append((lvl, 12, p, f"공통 필수 필드 누락: {', '.join(missing)}"))
 
-        # 11 — S 카드 스키마
-        # screen 이 비면 어느 화면을 본 것인지 추적할 수 없어 카드가 무의미해진다.
-        # captured 가 없으면 앱 업데이트 전후를 구분할 수 없다.
-        if t == "S":
-            for k in ("screen", "captured"):
-                if not fm.get(k):
-                    f.append((ERROR, 11, p, f"S 카드 필수 필드 누락: {k}"))
+        # 종류별 필수 필드. 목록은 cards.py 의 EXTRA_FIELDS 가 정본이며
+        # 여기에 다시 적지 않는다. 검사 번호는 TYPE_CHECK_NUM 을 따른다.
+        extra = [k for k in EXTRA_FIELDS.get(t, []) if not fm.get(k)]
+        if t == "E" and not (fm.get("url") or fm.get("local_file")):
+            extra.append("url 또는 local_file")
+        if extra:
+            f.append((
+                lvl, TYPE_CHECK_NUM.get(t, 12), p,
+                f"{t} 카드 필수 필드 누락: {', '.join(extra)}{FIELD_HINT.get(t, '')}",
+            ))
 
         # 7 — 근거 등급 D
         if t == "C" and str(fm.get("grade", "")).upper() == "D":
@@ -71,24 +73,6 @@ def run_checks(cards):
             st = fm.get("source_types") or []
             if len(set(st)) < 2:
                 f.append((lvl, 2, p, f"source_types가 {len(set(st))}종뿐입니다 (2종 이상 필요)"))
-
-        # 3 — P 카드 스키마
-        if t == "P":
-            for k in ("hypothesis", "survey_q", "n", "rate"):
-                if not fm.get(k):
-                    f.append((ERROR, 3, p, f"P 카드 필수 필드 누락: {k} — /gate1로만 생성하세요"))
-            if not fm.get("gate"):
-                f.append((ERROR, 3, p, "gate 필드 없음 — /gate1을 거치지 않고 만들어진 카드로 보입니다"))
-
-        # 4 — SOL 카드 pain_point
-        if t == "SOL" and not fm.get("pain_point"):
-            f.append((ERROR, 4, p, "pain_point 없음 — 개선안은 P 카드에 연결되어야 합니다"))
-
-        # 10 — M 카드 스키마 (뿌리 ① — 추적성이 SOL에서 끊기지 않게)
-        if t == "M":
-            for k in ("solution", "pain_point", "metric", "baseline", "result"):
-                if not fm.get(k):
-                    f.append((ERROR, 10, p, f"M 카드 필수 필드 누락: {k} — /gate2로만 생성하세요"))
 
         # 9 — ID 대역 (H·P·M 제외)
         if t not in BAND_EXEMPT_TYPES:
@@ -121,10 +105,10 @@ def run_checks(cards):
 
 
 NAMES = {
-    1: "존재하지 않는 ID 인용", 2: "H source_types 1종", 3: "P 카드 스키마",
+    1: "존재하지 않는 ID 인용", 2: "H 카드 스키마·source_types", 3: "P 카드 스키마",
     4: "SOL pain_point 누락", 5: "E 출처 4요소", 6: "고아 근거 카드",
     7: "근거 등급 D", 8: "ID 중복·형식", 9: "ID 대역 위반", 10: "M 카드 스키마",
-    11: "S 카드 스키마",
+    11: "S 카드 스키마", 12: "공통 필수 필드", 13: "C 카드 스키마",
 }
 
 

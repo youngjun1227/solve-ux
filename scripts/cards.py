@@ -41,12 +41,29 @@ BAND_EXEMPT_TYPES = {"H", "P", "M"}
 COMMON_FIELDS = ["id", "type", "author", "date", "summary"]
 
 # 종류별 추가 필수 필드. O 카드는 추가 필드가 없다 — 가장 단순해야 한다.
+# 문서 쪽 정본은 CLAUDE.md "카드 필수 필드"다. 둘이 어긋나면 CLAUDE.md 가 맞다.
+# traceability_check.py 가 이 표를 그대로 읽어 검사한다. 필드 목록을 그쪽에
+# 다시 적지 않는다.
 EXTRA_FIELDS = {
     "O": [],
     "E": ["source_org", "published", "page", "grade"],  # url 또는 local_file 은 별도 처리
     "S": ["screen", "captured"],
-    "C": ["app", "user_task", "grade", "capture"],
+    "C": ["app", "user_task", "grade", "capture", "captured"],
+    "H": ["status", "evidence", "source_types"],
+    "P": ["hypothesis", "survey_q", "n", "rate", "gate"],
+    "SOL": ["pain_point"],
+    "M": ["solution", "pain_point", "metric", "baseline", "result", "gate"],
 }
+
+# 필드가 비었을 때 붙일 안내. 카드를 만드는 경로가 정해진 종류에만 있다.
+FIELD_HINT = {
+    "P": " — /gate1로만 생성하세요",
+    "M": " — /gate2로만 생성하세요",
+}
+
+# 검사 번호 — 종류별 필수 필드 누락을 어느 번호로 보고할지.
+# 번호의 의미는 SETUP.md 7절 표와 같아야 한다.
+TYPE_CHECK_NUM = {"E": 5, "S": 11, "C": 13, "H": 2, "P": 3, "SOL": 4, "M": 10}
 
 # 본문 구조 — "사실"과 "해석"을 반드시 나눈다.
 # PROJECT_PLAN 핵심 원칙("우리 생각 ≠ 사용자의 불편")이 카드 단위로 내려오는 지점이다.
