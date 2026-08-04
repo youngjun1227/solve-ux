@@ -27,7 +27,8 @@
 | 카드 상수 (대역·필드·본문 구조) | `scripts/cards.py` | 문서 쪽 원본은 `CLAUDE.md` |
 | 기계 검사 항목 | `scripts/traceability_check.py` | 이 문서 7절은 목록만 |
 | 커밋 메시지 규칙 | `.claude/commands/save.md` | 이 문서 2절은 참조 |
-| 카드 작성 절차 | `.claude/skills/evidence-card/` | 이 문서 5-1절은 참조 |
+| 카드 작성 절차 (공통) | `.claude/skills/evidence-card/` | 이 문서 5-1절은 참조 |
+| 화면 분석 절차 · 경쟁사 절차 | 해당 `.claude/agents/*.md` | Skill로 빼지 않는다 (5절 기준) |
 | Gate 통과 기준 | `PROJECT_PLAN.md` | `/gate1` `/gate2`는 읽어서 제시 |
 | 일정 · 역할 · 용어 | `PROJECT_PLAN.md` | 참조만 |
 
@@ -47,7 +48,7 @@
 | 3 | `/start` `/save` 커맨드 + 위험 명령어 차단 | ✅ 완료 |
 | 4 | `evidence-card` Skill + `build_index.py` | ✅ 완료 |
 | 5 | 경로 검사 · 추적성 검사 · Gate 커맨드 | ✅ 완료 |
-| 6 | 리서치 agent 3개 + Skill 2개 | ⬜ **8/7 오전** — 오후 리서치 개시 조건 |
+| 6 | 리서치 agent 3개 (Skill은 agent에 포함) | ✅ 완료 |
 | 7 | 나머지 agent 4개 + Skill 3개 | ⬜ 8/14~8/28 (필요해지는 날짜별) |
 
 6·7번의 날짜별 배치는 `architecture_review.md` 4절 표를 따릅니다.
@@ -159,6 +160,23 @@ Gate 체크리스트의 판정 근거로 쓰려면 기계 검사 쪽이 통과/�
 
 ## 5. Skill (`.claude/skills/`)
 
+### Skill로 만들지, agent 안에 둘지 — 판단 기준
+
+**쓰는 쪽이 둘 이상이면 Skill, 하나뿐이면 그 agent 안에 둡니다.**
+
+| 절차 | 쓰는 쪽 | 그래서 |
+|---|---|---|
+| `evidence-card` | 사람(팀원 4명) + 리서치 agent 3종 | **Skill** — 공유해야 한다 |
+| 화면 분석 12개 관점 | `screen-analyst` 하나 | agent 안 |
+| 경쟁사 Task 5개·캡처 규칙 | `competitor-analyst` 하나 | agent 안 |
+
+쓰는 쪽이 하나인데 Skill로 빼면 **참조가 한 단계 늘어날 뿐이고, 같은 내용이 두 곳에
+생깁니다.** 0절 정본 표가 막으려는 바로 그 상황입니다.
+
+Skill 호출은 보장되지 않는다는 점도 걸립니다. agent 프롬프트는 그 agent가 돌 때
+반드시 로드되지만, Skill은 안 불릴 수 있습니다. 한 agent만 쓰는 절차라면
+agent 안에 두는 쪽이 더 확실합니다.
+
 ### 5-1. `evidence-card` — 완료
 
 **정본은 `.claude/skills/evidence-card/SKILL.md`입니다.** 카드 포맷과 ID 발급 절차는
@@ -174,24 +192,46 @@ Gate 체크리스트의 판정 근거로 쓰려면 기계 검사 쪽이 통과/�
 계산합니다. 대역이 사람마다 분리돼 있어 4명이 동시에 발급해도 겹치지 않습니다.
 카드 상수(대역·필수 필드·본문 구조)의 정본은 `scripts/cards.py`입니다.
 
-### 5-2. `screen-analysis-framework` — 8/7 오전
+### 5-2. `screen-analysis-framework` — Skill로 만들지 않습니다
 
-`PROJECT_PLAN.md` W1절 "화면 분석 카드는 이렇게 나눕니다"를 근거로, 아래 12개 관점을
-체크리스트로 만듭니다.
+**`SKILL.md`를 찾지 마세요. 없습니다.** 내용은 `.claude/agents/screen-analyst.md`
+안에 있습니다.
 
-Information Architecture / User Flow / Navigation / Discoverability / Information
-Hierarchy / Cognitive Load / Terminology / CTA / Consistency / Personalization /
-Accessibility / 콘텐츠 구조
+쓰는 쪽이 `screen-analyst` 하나뿐이라 위 판단 기준에 따라 agent 안에 뒀습니다.
+`evidence-card`와 대비하면 명확합니다 — 그쪽은 사람과 agent 4종이 공유하므로
+Skill이고, 이쪽은 한 agent만 쓰므로 agent 안입니다.
 
-출력은 2단 분리를 지킵니다. 서식의 정본은 `CLAUDE.md`(절대 규칙 7번)와
-`evidence-card` Skill이며, 이 Skill은 S 카드에 맞춰 적용만 합니다.
+agent 안에 들어 있는 것:
+12개 관점(Information Architecture / User Flow / Navigation / Discoverability /
+Information Hierarchy / Cognitive Load / Terminology / CTA / Consistency /
+Personalization / Accessibility / 콘텐츠 구조) · 2단 분리 서식 ·
+캡처 파일명 규칙 · 안 읽히는 요소 처리.
 
-### 5-3. `competitor-protocol` — 8/7 오전
+**12개를 다 채우지 않게** 하는 지시도 agent 안에 있습니다. 억지로 채우면
+근거 없는 문장이 생기고, 그게 이 프로젝트가 막으려는 것입니다.
 
-- User Task 5개 고정 (`PROJECT_PLAN.md` W1 참조)
-- 캡처 파일명 규칙: `{앱}_{T##}_{step##}.png`
-- 근거 등급 적용 — 기준의 정본은 `CLAUDE.md`(절대 규칙 6번). D등급은 카드 생성 금지
-- 출력은 기능 목록이 아니라 **Task별 비교표** (각 앱이 같은 목적을 몇 단계로, 어떤 UI로 해결하는가)
+### 5-3. `competitor-protocol` — Skill로 만들지 않습니다
+
+**`SKILL.md`를 찾지 마세요. 없습니다.** 내용은
+`.claude/agents/competitor-analyst.md` 안에 있습니다. 이유는 5-2와 같습니다.
+
+agent 안에 들어 있는 것:
+User Task 5개(T01~T05) · 캡처 파일명 규칙 `{앱}_{T##}_{step##}.png` ·
+근거 등급 적용(기준의 정본은 `CLAUDE.md` 절대 규칙 6번, D등급은 카드 생성 금지) ·
+Task별 비교표 형식 · 우열 판정 금지.
+
+### 5-4~5-6 — 만들 때 위 판단 기준으로 다시 정할 것
+
+아래 셋은 아직 만들지 않았습니다. 만들 때 **"쓰는 쪽이 둘 이상인가"**를 먼저 보세요.
+지금 예상은 이렇습니다.
+
+| | 쓰는 쪽 | 예상 |
+|---|---|---|
+| `synthesis-method` | `synthesizer` 하나 | agent 안 |
+| `survey-design` | `survey-designer` + `red-team-auditor`(유도질문 검사) | Skill |
+| `usability-test-protocol` | 팀원3(사람) + `data-analyst` | Skill |
+
+아래 내용은 어디에 넣든 그대로 씁니다.
 
 ### 5-4. `synthesis-method` — 8/16 전
 
@@ -253,8 +293,8 @@ Accessibility / 콘텐츠 구조
 | agent | tools | 쓰기 허용 경로 |
 |---|---|---|
 | `desk-researcher` | WebSearch, WebFetch, Read, Write, Bash | `01_evidence/desk/` |
-| `competitor-analyst` | Read, Write, Bash, Glob — **웹 도구 없음** | `01_evidence/competitor/` |
-| `screen-analyst` | Read, Write, Bash, Glob — **웹 도구 없음** | `01_evidence/screen/` |
+| `competitor-analyst` | Read, Write, Bash, Glob<br>🚫 **웹 도구 절대 추가 금지**<br>웹에는 마케팅 자료뿐이라 도구가 있으면 캡처 없이 "토스는 이렇게 한다"를 지어낸다. PROJECT_PLAN W1이 순서를 뒤집은 이유가 이것 | `01_evidence/competitor/` |
+| `screen-analyst` | Read, Write, Bash, Glob<br>🚫 **웹 도구 절대 추가 금지**<br>SuperSOL 화면도 로그인해야 보인다. 같은 이유 | `01_evidence/screen/` |
 | `synthesizer` | Read, Grep, Glob, Write | `02_hypothesis/draft/` **만** |
 | `survey-designer` | Read, Write | `03_validation/design/` |
 | `data-analyst` | Read, Bash(python), Write | `03_validation/analysis/`, `07_usertest/analysis/` |
@@ -262,16 +302,24 @@ Accessibility / 콘텐츠 구조
 
 **쓰기 경로를 제한하는 이유:** `desk-researcher`가 실수로 `02_hypothesis/`를 덮어쓰면 추적성이 끊깁니다. 감사역은 읽기 전용에 리포트만 쓰게 해서, 자기가 지적한 걸 자기가 고치는 상황을 막습니다.
 
-**`competitor-analyst`와 `screen-analyst`에 웹 도구를 주지 않는 이유 — 중요합니다.**
+**웹 도구가 없는 두 agent — 친절하게 추가하지 마세요.**
+
+`competitor-analyst`와 `screen-analyst`가 도구를 못 받은 것처럼 보일 수 있습니다.
+**일부러 뺀 것입니다.**
 
 경쟁 앱의 실제 화면은 로그인해야 보입니다. 웹에서 찾을 수 있는 것은 마케팅 자료뿐이고,
 그것으로 "토스는 이렇게 한다"고 쓰면 그럴듯하지만 틀린 카드가 만들어집니다.
+발표에서 심사자가 앱을 열어보면 바로 드러납니다.
+
 PROJECT_PLAN W1이 순서를 뒤집은 이유가 이것입니다 — **사람이 먼저 직접 찍고, AI는
 그 캡처만 봅니다.**
 
 웹 도구를 주면 이 안전장치가 프롬프트 문구 하나에만 의존하게 됩니다.
-도구를 아예 빼면 구조가 대신 막습니다. 초안 표에는 `competitor-analyst`에 WebFetch가
-있었는데, 그대로 만들었다면 이 원칙이 무너졌을 것입니다.
+도구를 빼면 구조가 대신 막습니다. **"근거 없으면 쓰지 마라"고 적어두는 것보다
+쓸 수단을 없애는 것이 확실합니다.**
+
+초안 표에는 `competitor-analyst`에 WebFetch가 있었습니다. 그대로 만들었다면
+이 원칙이 통째로 무너졌을 것입니다. 그래서 금지 문구를 표 안에 넣어뒀습니다.
 
 ### `red-team-auditor` 점검 항목 — 판단이 필요한 것만
 
@@ -403,8 +451,8 @@ ERROR가 1건이라도 있으면 exit code 1을 반환합니다.
 - [ ] `_meta/decision_log.md`, `source_wishlist.md` 생성
 
 ### 8/7(금) 오전 — 오후 리서치 개시 조건
-- [ ] agent 3개: `desk-researcher` `screen-analyst` `competitor-analyst`
-- [ ] Skill 2개: `screen-analysis-framework` `competitor-protocol`
+- [x] agent 3개: `desk-researcher` `screen-analyst` `competitor-analyst`
+      (Skill 2개는 만들지 않음 — 5-2·5-3절 참고)
 - [ ] `/audit` 1회 시범 실행
 
 ### 8/8~8/9
