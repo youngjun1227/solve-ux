@@ -29,6 +29,7 @@
 | 커밋 메시지 규칙 | `.claude/commands/save.md` | 이 문서 2절은 참조 |
 | 카드 작성 절차 (공통) | `.claude/skills/evidence-card/` | 이 문서 5-1절은 참조 |
 | 화면 분석 절차 · 경쟁사 절차 | 해당 `.claude/agents/*.md` | Skill로 빼지 않는다 (5절 기준) |
+| 캡처 폴더 · 파일명 · 형식 | `CLAUDE.md` "캡처 파일" | HOWTO 3-4·3-5는 조작법만 |
 | Gate 통과 기준 | `PROJECT_PLAN.md` | `/gate1` `/gate2`는 읽어서 제시 |
 | 일정 · 역할 · 용어 | `PROJECT_PLAN.md` | 참조만 |
 

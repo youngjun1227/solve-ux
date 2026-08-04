@@ -56,6 +56,18 @@
   → 경쟁 앱은 발표 전에 업데이트된다. 언제 찍은 화면인지가 없으면 근거로 쓸 수 없다
 - S 카드: screen (캡처 경로), captured (캡처한 날짜)
   → 앱은 업데이트되므로 언제 찍은 화면인지가 없으면 근거로 쓸 수 없다
+
+## 캡처 파일
+
+- 캡처 이미지는 종류와 무관하게 **01_evidence/screens/ 한 곳에** 둔다.
+  01_evidence/screen/ 은 S 카드가 들어가는 곳이며 이미지 폴더가 아니다.
+- 파일명에 반드시 촬영 날짜를 넣는다. 재촬영 시 앞의 파일을 덮어쓰지 않게 한다.
+  SuperSOL: supersol_{화면이름}_{YYYYMMDD}.png
+  경쟁 앱:  {앱}_{T##}_{step##}_{YYYYMMDD}.png
+- 형식은 PNG 또는 JPG만 쓴다. **HEIC는 읽을 수 없다.**
+  아이폰 기본 설정이 HEIC이므로 촬영 전에 확인이 필요하다.
+- 캡처는 저장소에 파일로 있어야 한다. 채팅에 붙여넣은 이미지는
+  카드의 screen·capture 필드에 적을 경로가 없어 카드를 만들 수 없다.
 - H 카드: status, evidence[], source_types[], validated_by
   → source_types는 서로 다른 종류가 최소 2개여야 한다
 - P 카드: hypothesis(H-### 필수), survey_q[], n, rate, gate

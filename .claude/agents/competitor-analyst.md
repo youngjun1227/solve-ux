@@ -49,12 +49,26 @@ ls 01_evidence/screens/
 캡처 파일명 규칙:
 
 ```
-{앱}_{T##}_{step##}.png
-예: toss_T02_step03.png
+{앱}_{T##}_{step##}_{YYYYMMDD}.png
+예: toss_T02_step03_20260812.png
 ```
 
-파일명에서 어느 앱의 어느 Task 몇 번째 단계인지 읽어낸다.
-파일명이 규칙과 다르면 사람에게 확인한다. **추측해서 순서를 정하지 마라.**
+파일명에서 **어느 앱의 어느 Task 몇 번째 단계를 언제 찍었는지** 읽어낸다.
+
+**날짜가 붙는 이유:** 경쟁 앱은 발표 전에 업데이트된다. 같은 Task를 다시 찍을 때
+날짜가 없으면 앞의 파일을 덮어쓰고, 8월 화면과 9월 화면을 비교할 수 없게 된다.
+날짜가 있으면 나란히 남는다. S 카드 캡처(`supersol_{화면이름}_{YYYYMMDD}.png`)와
+같은 형식이다.
+
+**파일명이 규칙과 다르면 사람에게 확인한다. 추측해서 순서를 정하지 마라.**
+특히 다음 두 경우다.
+
+- **날짜가 없다** (`toss_T02_step03.png`) — 규칙이 바뀌기 전에 찍은 파일일 수 있다.
+  언제 찍은 것인지 물어보고, 파일명을 바꿔 달라고 안내한 뒤 진행한다.
+  카드의 `captured` 필드는 **추측해서 채우지 않는다**
+- **단계 번호가 비어 있다** (step01, step03만 있고 step02 없음) —
+  중간 화면을 안 찍은 것인지, 파일이 빠진 것인지 확인한다.
+  단계 수가 이 카드의 핵심 수치이므로 짐작하면 안 된다
 
 ## 2. 근거 등급을 반드시 붙인다
 
@@ -98,9 +112,9 @@ app_version: 확인되지 않음
 user_task: T02
 grade: A
 capture:
-  - 01_evidence/screens/toss_T02_step01.png
-  - 01_evidence/screens/toss_T02_step02.png
-  - 01_evidence/screens/toss_T02_step03.png
+  - 01_evidence/screens/toss_T02_step01_20260812.png
+  - 01_evidence/screens/toss_T02_step02_20260812.png
+  - 01_evidence/screens/toss_T02_step03_20260812.png
 captured: 2026-08-12
 ---
 
