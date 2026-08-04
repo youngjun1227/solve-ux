@@ -69,6 +69,16 @@ python3 scripts/check_commit_paths.py --all
 - 올라갈 파일 목록 (추가 / 수정 / 삭제 구분)
 - 만든 커밋 메시지
 
+목록은 반드시 이렇게 뽑는다.
+
+```
+git -c core.quotepath=false diff --cached --name-status
+```
+
+`-c core.quotepath=false` 를 빼면 한글 파일명이
+`"03_validation/design/\354\204\244\353\254\270..."` 처럼 깨져 나온다.
+사람이 목록을 눈으로 보는 지점이 여기 하나뿐인데 읽을 수 없으면 확인이 무의미하다.
+
 그리고 묻는다. **"이대로 올릴까요?"**
 
 이 확인 절차가 필요한 이유: 되돌리기 명령(`git checkout`)이 허용돼 있어서, 의도치
