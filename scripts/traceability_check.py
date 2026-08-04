@@ -12,79 +12,17 @@
 종료 코드: ERROR 1건 이상이면 1, 아니면 0.
 카드가 한 장도 없어도 에러 없이 돌아간다.
 """
-import re
 import sys
 from datetime import date
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-
-# 카드가 있는 곳. 없어도 문제없다.
-CARD_DIRS = [
-    "01_evidence",
-    "02_hypothesis",
-    "04_painpoint",
-    "05_solution",
-    "07_usertest/measurement",
-]
-
-ID_RE = re.compile(r"^(O|E|S|C|H|P|SOL|M)-(\d+)$")
-
-# ID 대역 — CLAUDE.md "ID 규칙"이 원본이다.
-# H·P·M은 대역이 없다(회의에서만 생성). 따라서 검사 9번 대상이 아니다.
-BANDS = {"팀장": 1, "팀원1": 2, "팀원2": 3, "팀원3": 4}
-BAND_EXEMPT_TYPES = {"H", "P", "M"}
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+# 카드 상수·읽기는 전부 cards.py 에 있다. 여기에 복제하지 않는다.
+from cards import (  # noqa: E402
+    ROOT, ID_RE, BANDS, BAND_EXEMPT_TYPES, card_type, load_cards,
+)
 
 ERROR, WARN = "ERROR", "WARN"
-
-
-def parse_front_matter(text):
-    """--- 로 감싼 앞부분만 아주 단순하게 파싱한다. 외부 라이브러리를 쓰지 않는다."""
-    if not text.startswith("---"):
-        return {}
-    end = text.find("\n---", 3)
-    if end == -1:
-        return {}
-    data = {}
-    for line in text[3:end].splitlines():
-        line = line.split("#")[0].rstrip()
-        if not line.strip() or ":" not in line:
-            continue
-        key, _, val = line.partition(":")
-        key, val = key.strip(), val.strip()
-        if val.startswith("[") and val.endswith("]"):
-            items = [v.strip().strip("'\"") for v in val[1:-1].split(",")]
-            data[key] = [v for v in items if v]
-        else:
-            v = val.strip("'\"")
-            data[key] = None if v in ("", "null", "~") else v
-    return data
-
-
-def load_cards():
-    cards = []
-    for d in CARD_DIRS:
-        base = ROOT / d
-        if not base.exists():
-            continue
-        for path in sorted(base.rglob("*.md")):
-            fm = parse_front_matter(path.read_text(encoding="utf-8"))
-            if not fm.get("id"):
-                continue
-            cards.append(
-                {
-                    "fm": fm,
-                    "id": str(fm["id"]),
-                    "path": path.relative_to(ROOT).as_posix(),
-                    "is_draft": "02_hypothesis/draft/" in path.as_posix(),
-                }
-            )
-    return cards
-
-
-def card_type(cid):
-    m = ID_RE.match(cid)
-    return m.group(1) if m else None
 
 
 def run_checks(cards):
