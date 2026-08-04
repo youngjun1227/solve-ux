@@ -54,6 +54,14 @@ def run_checks(cards):
             if missing:
                 f.append((ERROR, 5, p, f"출처 4요소 누락: {', '.join(missing)}"))
 
+        # 11 — S 카드 스키마
+        # screen 이 비면 어느 화면을 본 것인지 추적할 수 없어 카드가 무의미해진다.
+        # captured 가 없으면 앱 업데이트 전후를 구분할 수 없다.
+        if t == "S":
+            for k in ("screen", "captured"):
+                if not fm.get(k):
+                    f.append((ERROR, 11, p, f"S 카드 필수 필드 누락: {k}"))
+
         # 7 — 근거 등급 D
         if t == "C" and str(fm.get("grade", "")).upper() == "D":
             f.append((WARN, 7, p, "근거 등급 D — 카드를 만들지 않는 것이 원칙입니다"))
@@ -116,6 +124,7 @@ NAMES = {
     1: "존재하지 않는 ID 인용", 2: "H source_types 1종", 3: "P 카드 스키마",
     4: "SOL pain_point 누락", 5: "E 출처 4요소", 6: "고아 근거 카드",
     7: "근거 등급 D", 8: "ID 중복·형식", 9: "ID 대역 위반", 10: "M 카드 스키마",
+    11: "S 카드 스키마",
 }
 
 

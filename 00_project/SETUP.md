@@ -301,7 +301,7 @@ Accessibility / 콘텐츠 구조
 **정본은 `scripts/traceability_check.py`입니다.** 아래 표는 목록일 뿐이며, 검사를
 추가·수정할 때는 스크립트를 고칩니다.
 
-### 검사 항목 (10개)
+### 검사 항목 (11개)
 
 | # | 검사 | 심각도 |
 |---|---|---|
@@ -315,6 +315,7 @@ Accessibility / 콘텐츠 구조
 | 8 | ID 중복·형식 오류 | ERROR |
 | 9 | ID 대역 위반 — O·E·S·C·SOL만 대상. **H·P·M은 대역이 없으므로 제외** | WARN |
 | 10 | M 카드 스키마 — `solution`·`pain_point`·`metric`·`baseline`·`result` | ERROR |
+| 11 | S 카드 스키마 — `screen`·`captured` | ERROR |
 
 **#3이 필드 존재만 보지 않는 이유:** `validated_by`가 비어 있지 않기만 하면 통과하던
 초안 설계로는, 손으로 만든 P 카드가 그대로 통과합니다. 값이 실제로 있어야 합니다.

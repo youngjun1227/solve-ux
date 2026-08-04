@@ -44,7 +44,7 @@ COMMON_FIELDS = ["id", "type", "author", "date", "summary"]
 EXTRA_FIELDS = {
     "O": [],
     "E": ["source_org", "published", "page", "grade"],  # url 또는 local_file 은 별도 처리
-    "S": ["screen"],
+    "S": ["screen", "captured"],
     "C": ["app", "user_task", "grade", "capture"],
 }
 

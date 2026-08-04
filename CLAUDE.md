@@ -53,7 +53,8 @@
 - 공통: id, type, author, date, summary (summary는 한 줄)
 - E 카드: source_org, published, url 또는 local_file, page, grade
 - C 카드: app, user_task, grade, capture (파일 경로)
-- S 카드: screen (캡처 경로)
+- S 카드: screen (캡처 경로), captured (캡처한 날짜)
+  → 앱은 업데이트되므로 언제 찍은 화면인지가 없으면 근거로 쓸 수 없다
 - H 카드: status, evidence[], source_types[], validated_by
   → source_types는 서로 다른 종류가 최소 2개여야 한다
 - P 카드: hypothesis(H-### 필수), survey_q[], n, rate, gate
