@@ -1,0 +1,67 @@
+# SOL:VE .gitignore
+#
+# 설계 원칙: 개인정보가 들어올 수 있는 폴더는 "차단 후 허용"(화이트리스트)으로 쓴다.
+# 확장자·파일명 블랙리스트는 이름을 바꾸면 뚫리므로 보조 수단으로만 쓴다.
+# 근거: 00_project/architecture_review.md 뿌리 ③
+
+
+# ── 03_validation/ — 설문 (화이트리스트) ────────────────────────────
+# 응답 원본에 연락처·자유응답이 섞여 들어온다. 커밋되면 git history에서
+# 지울 수 없으므로 전부 차단하고 익명화·설계 산출물만 다시 연다.
+03_validation/*
+!03_validation/design/
+!03_validation/anonymized/
+!03_validation/analysis/
+# raw/ 는 폴더만 남기고 내용물은 전부 차단한다.
+# 폴더가 없으면 팀원3이 원본을 어디에 둘지 몰라 다른 곳에 두게 된다.
+!03_validation/raw/
+03_validation/raw/*
+!03_validation/raw/.gitkeep
+
+
+# ── 07_usertest/ — 사용자 테스트 (화이트리스트) ─────────────────────
+# 녹화·녹음·이름이 남은 기록이 들어온다. 규칙은 03_validation/과 동일.
+07_usertest/*
+!07_usertest/protocol/
+!07_usertest/anonymized/
+!07_usertest/analysis/
+!07_usertest/measurement/
+!07_usertest/raw/
+07_usertest/raw/*
+!07_usertest/raw/.gitkeep
+
+
+# ── 자동 생성물 ─────────────────────────────────────────────────────
+# 카드 front-matter에서 매번 다시 만들어진다. 커밋하면 4명이 같은 줄을
+# 동시에 고쳐 충돌한다. 소스가 아니라 생성물이다.
+01_evidence/index.csv
+_meta/traceability.md
+
+
+# ── 영상·음성 전체 차단 ─────────────────────────────────────────────
+# 위 화이트리스트를 우회해 다른 폴더에 실수로 저장하는 경우의 2차 방어선.
+*.mp4
+*.mov
+*.avi
+*.m4a
+*.mp3
+*.wav
+
+
+# ── 연락처 파일명 패턴 ──────────────────────────────────────────────
+# 3차 방어선. 이름을 바꾸면 뚫리므로 이것만 믿지 않는다.
+# 연락처는 애초에 저장소에 두지 않는 것이 원칙이다 (PROJECT_PLAN 10절).
+**/contacts*
+**/연락처*
+**/participants*
+**/응답자*
+**/*개인정보*
+
+
+# ── 개발 ────────────────────────────────────────────────────────────
+node_modules/
+dist/
+build/
+.env
+.env.*
+.DS_Store
