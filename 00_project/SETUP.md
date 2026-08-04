@@ -48,8 +48,8 @@
 | 3 | `/start` `/save` 커맨드 + 위험 명령어 차단 | ✅ 완료 |
 | 4 | `evidence-card` Skill + `build_index.py` | ✅ 완료 |
 | 5 | 경로 검사 · 추적성 검사 · Gate 커맨드 | ✅ 완료 |
-| 6 | 리서치 agent 3개 (Skill은 agent에 포함) | ✅ 완료 |
-| 7 | 나머지 agent 4개 + Skill 3개 | ⬜ 8/14~8/28 (필요해지는 날짜별) |
+| 6 | 리서치 agent 3개 + red-team-auditor + synthesizer | ✅ 완료 |
+| 7 | `survey-designer` `data-analyst` + Skill 2개 | ⬜ 8/19~8/28 |
 
 6·7번의 날짜별 배치는 `architecture_review.md` 4절 표를 따릅니다.
 
@@ -227,19 +227,27 @@ Task별 비교표 형식 · 우열 판정 금지.
 
 | | 쓰는 쪽 | 예상 |
 |---|---|---|
-| `synthesis-method` | `synthesizer` 하나 | agent 안 |
+| `synthesis-method` | `synthesizer` 하나 | agent 안 ✅ 확정 |
 | `survey-design` | `survey-designer` + `red-team-auditor`(유도질문 검사) | Skill |
 | `usability-test-protocol` | 팀원3(사람) + `data-analyst` | Skill |
 
 아래 내용은 어디에 넣든 그대로 씁니다.
 
-### 5-4. `synthesis-method` — 8/16 전
+### 5-4. `synthesis-method` — Skill로 만들지 않습니다
 
-- 삼각검증 절차: 서로 다른 종류의 근거 2개 이상이 같은 방향을 가리킬 때만 가설화
-- `source_types` 2종 규칙의 정본은 `CLAUDE.md`, 위반 검출은 `traceability_check.py` #2
-- H 카드 포맷 + 근거 ID 인용 강제
-- **초안은 `02_hypothesis/draft/`에만 만듭니다.** 확정은 8/17 회의에서 합니다
-- 출력 상한: 초안 10개 이내 (팀이 5~7개로 압축)
+**`SKILL.md`를 찾지 마세요. 없습니다.** 내용은 `.claude/agents/synthesizer.md`
+안에 있습니다. 쓰는 쪽이 `synthesizer` 하나뿐이라 위 판단 기준을 따랐습니다.
+
+agent 안에 들어 있는 것:
+- 삼각검증 — 서로 다른 종류 2개 이상이 같은 방향을 가리킬 때만 가설화
+- **종류를 세기 전에 그 근거가 가설의 주어를 지지하는지 확인** —
+  형식상 2종인데 실질 1종인 경우를 걸러낸다. `#2` 검사가 못 잡는 지점이다
+- 주어 대조 — 근거의 조사 대상과 가설의 주어가 어긋나면 좁히거나 만들지 않는다
+- **`index.csv` 요약부터 읽는다.** 8/16이면 카드가 수백 장이라 전문을 다 읽으면
+  컨텍스트가 끊긴다. `summary`를 필수로 만든 이유가 이것이다
+- 초안은 `02_hypothesis/draft/`에만. 확정은 8/17 회의
+- 출력 상한 10개 (팀이 5~7개로 압축)
+- 억지로 묶지 않는다 — 고립 카드가 있는 것은 정상이다
 
 ### 5-5. `survey-design` — 8/19 전
 
