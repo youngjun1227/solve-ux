@@ -27,7 +27,7 @@
 ### 폴더 구조
 
 ```bash
-mkdir -p solve-ux/{00_project,01_evidence/{team,desk/sources,screen,competitor,screens},02_hypothesis,03_validation/{design,raw,anonymized,analysis},04_painpoint,05_solution,06_prototype,07_usertest/{protocol,raw,anonymized,analysis},08_deliverable,_meta,.claude/{agents,skills,commands}}
+mkdir -p solve-ux/{00_project,01_evidence/{team,desk/sources,screen,competitor,screens},02_hypothesis/draft,03_validation/{design,raw,anonymized,analysis},04_painpoint,05_solution,06_prototype,07_usertest/{protocol,raw,anonymized,analysis},08_deliverable,_meta,.claude/{agents,skills,commands}}
 ```
 
 각 폴더에 `.gitkeep`을 넣어 빈 폴더도 커밋되게 합니다.
@@ -111,10 +111,16 @@ dist/
 
 - O-### 팀 관찰 / E-### 데스크 / S-### 화면 / C-### 경쟁사
 - H-### 가설 / P-### 검증된 Pain Point / SOL-### 개선안 / M-### 측정결과
-- ID 대역: 팀장 x1xx / 팀원1 x2xx / 팀원2 x3xx / 팀원3 x4xx
+- ID 대역(카드 종류 무관, 사람당 하나): 팀장 100번대 / 팀원1 200번대 /
+  팀원2 300번대 / 팀원3 400번대
+  → O·E·S·C·SOL에 적용한다. (예: 팀원3 → O-401, E-402, S-403, C-404, SOL-405)
+  → H·P·M은 대역이 없다. 001부터 순번으로 발급하며 회의에서만 생성된다.
+    따라서 H·P·M은 대역 위반 검사(traceability_check #9)의 대상이 아니다.
 - 카드는 절대 삭제하지 않는다. status 변경만 허용한다.
-- H 카드는 02_hypothesis/에만, P 카드는 04_painpoint/에만 존재한다.
-  P 카드는 Gate 1 통과 시에만 새로 생성된다.
+- H 카드 초안은 02_hypothesis/draft/에, 팀이 확정한 H 카드는 02_hypothesis/에 둔다.
+  draft/의 초안은 8/17 종합 회의에서 확정된 것만 02_hypothesis/로 승격된다.
+- P 카드는 04_painpoint/에만 존재하며 Gate 1 통과 시에만 새로 생성된다.
+- M 카드는 Gate 2 통과 시에만 새로 생성된다.
 
 ## 카드 필수 필드
 
@@ -133,10 +139,15 @@ dist/
 "사용자는 ~를 불편해한다" / "~가 문제다" / "명백히" / "확실히"
 → "~할 가능성이 있다" / "~로 보인다" / "가설: ~"
 
-## 파일 소유권
+## 파일 소유권 — 폴더가 아니라 ID 대역
 
-각자 담당 폴더에서만 작업한다. 다른 사람 폴더의 파일을 수정하지 않는다.
-02_hypothesis/와 _meta/decision_log.md는 팀 회의 중에만 수정한다.
+- 소유 단위는 폴더가 아니라 ID 대역이다. 폴더는 분류일 뿐 소유물이 아니다.
+- 각자 자기 대역(위 "ID 규칙" 참조) 번호의 카드만 생성·수정한다.
+  남의 대역 카드는 수정하지 않는다.
+- 여러 명이 같은 폴더에 카드를 만드는 것은 정상이며 위반이 아니다.
+  01_evidence/team/(전원) · 01_evidence/desk/(팀장·팀원2·팀원3) · 05_solution/(팀장·팀원2)
+- 번호가 없는 공용 파일(_meta/decision_log.md, 08_deliverable/outline.md 등)은
+  팀 회의 중에만 수정한다.
 
 ## 개인정보
 
@@ -323,7 +334,7 @@ Information Architecture / User Flow / Navigation / Discoverability / Informatio
 | `desk-researcher` | WebSearch, WebFetch, Read, Write | `01_evidence/desk/` |
 | `competitor-analyst` | Read(이미지), WebFetch, Write | `01_evidence/competitor/` |
 | `screen-analyst` | Read(이미지), Write | `01_evidence/screen/` |
-| `synthesizer` | Read, Grep, Glob, Write | `02_hypothesis/` |
+| `synthesizer` | Read, Grep, Glob, Write | `02_hypothesis/draft/` **만** |
 | `survey-designer` | Read, Write | `03_validation/design/` |
 | `data-analyst` | Read, Bash(python), Write | `03_validation/analysis/`, `07_usertest/analysis/` |
 | `red-team-auditor` | Read, Grep, Glob, Write | `_meta/` **만** |
@@ -378,7 +389,7 @@ Information Architecture / User Flow / Navigation / Discoverability / Informatio
 | 6 | 어떤 H에도 인용되지 않은 근거 카드 (고아) | WARN |
 | 7 | 근거 등급 D인 C 카드가 존재 | WARN |
 | 8 | ID 중복 | ERROR |
-| 9 | ID 대역 위반 (담당자 대역 밖 번호 사용) | WARN |
+| 9 | ID 대역 위반 (담당자 대역 밖 번호 사용) — O·E·S·C·SOL만 대상. **H·P·M은 대역이 없으므로 검사 제외** | WARN |
 
 ### 출력
 
