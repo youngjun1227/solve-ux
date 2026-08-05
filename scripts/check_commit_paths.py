@@ -18,6 +18,14 @@
   .gitignore 는 이미 추적 중인 파일을 막지 못한다. 한 번 추적 상태가 된
   파일은 이후 .gitignore 에 넣어도 계속 커밋된다. --all 은 그렇게
   들어와 버린 파일을 찾아낸다.
+
+--all 이 아직 추적되지 않은 새 파일까지 보는 이유:
+  .gitignore 는 paths.py 의 수동 사본이라 규칙이 어긋날 수 있다. 실제로
+  paths.py 는 파일명에 '연락처'가 들어가면 어디에 있든 차단하지만,
+  .gitignore 의 `**/연락처*` 는 이름이 그 글자로 시작할 때만 걸린다.
+  그래서 '참가자연락처.md' 는 무시되지도 않고 추적되지도 않은 상태가 되어,
+  추적 파일만 보면 검사를 그냥 통과한다. 그다음 /save 의 git add 가 그대로
+  스테이징한다. 커밋 히스토리는 되돌릴 수 없으므로 여기서 잡아야 한다.
 """
 import subprocess
 import sys
@@ -48,8 +56,13 @@ def ignored_files():
 
 def main(argv):
     if "--all" in argv:
-        targets = git_z("ls-files", "-z")
-        label = "추적 중인 전체 파일"
+        # 추적 중인 파일 + 아직 추적되지 않은 새 파일(무시되는 것은 제외).
+        # 새 파일을 빼면 위 주석의 구멍이 생긴다. 무시되는 파일은 어차피
+        # 커밋되지 않으므로 explain_ignored 쪽에서 따로 안내한다.
+        tracked = git_z("ls-files", "-z")
+        untracked = git_z("ls-files", "-z", "--others", "--exclude-standard")
+        targets = tracked + untracked
+        label = "추적 중인 파일 + 새 파일"
         show_ignored = True
     elif argv:
         targets = argv

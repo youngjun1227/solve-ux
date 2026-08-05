@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-ID_RE = re.compile(r"^(O|E|S|C|H|P|SOL|M)-(\d+)$")
+ID_RE = re.compile(r"^(O|E|S|C|X|H|P|SOL|M)-(\d+)$")
 
 # 카드가 있는 곳. 폴더가 없어도 문제없다.
 CARD_DIRS = [
@@ -29,12 +29,67 @@ EVIDENCE_DIR = {
     "E": "01_evidence/desk",
     "S": "01_evidence/screen",
     "C": "01_evidence/competitor",
+    "X": "01_evidence/expert",
 }
+
+# next_id.py 가 번호를 발급할 수 있는 종류. 대역이 있는 종류 전부다.
+# EVIDENCE_DIR 에 SOL 이 없다고 해서 SOL 을 빼면 CLAUDE.md("O·E·S·C·X·SOL에
+# 적용한다")와 어긋난다. 목록을 next_id.py 안에 따로 두지 않는다.
+ISSUABLE_DIR = dict(EVIDENCE_DIR, SOL="05_solution")
 
 # ID 대역. 카드 종류와 무관하게 사람당 하나다.
 # H·P·M 은 대역이 없다(회의에서만 생성) → 대역 검사 대상이 아니다.
 BANDS = {"팀장": 1, "팀원1": 2, "팀원2": 3, "팀원3": 4}
 BAND_EXEMPT_TYPES = {"H", "P", "M"}
+
+# 가설의 재료가 되는 근거 카드 종류. 고아 카드 검사(#6)의 대상이다.
+EVIDENCE_TYPES = ("O", "E", "S", "C", "X")
+
+# 종류별로 카드가 있어야 하는 폴더. CLAUDE.md "카드 승격 경로"의 실행 가능한 형태다.
+# P 는 /gate1, M 은 /gate2 로만 만들어지므로 그 폴더 밖에 있으면 규칙 위반이다.
+CARD_HOME = {
+    "O": ("01_evidence/team",),
+    "E": ("01_evidence/desk",),
+    "S": ("01_evidence/screen",),
+    "C": ("01_evidence/competitor",),
+    "X": ("01_evidence/expert",),
+    "H": ("02_hypothesis", "02_hypothesis/draft"),
+    "P": ("04_painpoint",),
+    "SOL": ("05_solution",),
+    "M": ("07_usertest/measurement",),
+}
+
+# 캡처를 가리키는 필드. 파일이 실제로 있어야 근거가 된다.
+CAPTURE_FIELD = {"S": "screen", "C": "capture"}
+
+# 읽을 수 있는 캡처 형식. HEIC 는 Read 도구가 열지 못한다(CLAUDE.md "캡처 파일").
+CAPTURE_SUFFIXES = (".png", ".jpg", ".jpeg")
+
+# 캡처 이미지가 있어야 하는 폴더(CLAUDE.md "캡처 파일"). 종류와 무관하게 한 곳이다.
+# 01_evidence/screen/ 는 S 카드가 들어가는 곳이지 이미지 폴더가 아니다.
+CAPTURE_HOME = "01_evidence/screens/"
+
+# 버린 카드. 삭제 대신 이 status 로 바꾼다(CLAUDE.md "ID 규칙").
+# 내용 검사를 더 해봐야 의미가 없으므로 지적 대상에서 뺀다.
+DROPPED_STATUS = {"dropped", "버림"}
+
+# 게이트 기록 파일. P·M 은 회의(=게이트)의 산출물이므로, 카드가 있는데
+# 기록에 그 ID 가 없으면 게이트를 거치지 않고 만들어진 것이다.
+# 폴더만으로는 이것을 막을 수 없다 — 폴더는 누구나 파일을 넣을 수 있다.
+GATE_RECORD = {
+    "P": "_meta/gate1_record.md",
+    "M": "_meta/gate2_record.md",
+}
+GATE_COMMAND = {"P": "/gate1", "M": "/gate2"}
+
+# 근거 등급. 정의처는 CLAUDE.md "근거 등급"이며 이 표는 그것의 실행 가능한 형태다.
+# grade 필드를 갖는 카드 종류 전부에 적용된다.
+GRADED_TYPES = ("E", "C")
+GRADE_VALUES = ("A", "B", "C", "D")
+
+# X 카드에서 의견으로 표시된 답변. 멘토 개인 의견은 사용자 조사를 대체하지
+# 못하므로 H·SOL 의 근거로 쓸 수 없다. 검사 #15 가 이것을 본다.
+OPINION_VALUES = {"opinion", "의견", "판단"}
 
 # 모든 카드 공통. summary 는 한 줄 요약이며 카드가 수백 장이 됐을 때
 # 이것만 모아 보게 된다.
@@ -49,6 +104,7 @@ EXTRA_FIELDS = {
     "E": ["source_org", "published", "page", "grade"],  # url 또는 local_file 은 별도 처리
     "S": ["screen", "captured"],
     "C": ["app", "user_task", "grade", "capture", "captured"],
+    "X": ["question", "asked", "answer_type", "confidential"],
     "H": ["status", "evidence", "source_types"],
     "P": ["hypothesis", "survey_q", "n", "rate", "gate"],
     "SOL": ["pain_point"],
@@ -63,7 +119,7 @@ FIELD_HINT = {
 
 # 검사 번호 — 종류별 필수 필드 누락을 어느 번호로 보고할지.
 # 번호의 의미는 SETUP.md 7절 표와 같아야 한다.
-TYPE_CHECK_NUM = {"E": 5, "S": 11, "C": 13, "H": 2, "P": 3, "SOL": 4, "M": 10}
+TYPE_CHECK_NUM = {"E": 5, "S": 11, "C": 13, "X": 14, "H": 2, "P": 3, "SOL": 4, "M": 10}
 
 # 본문 구조 — "사실"과 "해석"을 반드시 나눈다.
 # PROJECT_PLAN 핵심 원칙("우리 생각 ≠ 사용자의 불편")이 카드 단위로 내려오는 지점이다.
@@ -72,10 +128,12 @@ BODY_SECTIONS = {
     "E": ("## 사실 (자료에 적힌 그대로)", "## 내 해석 (내 생각)"),
     "S": ("## 화면에서 확인되는 사실", "## UX 관점 해석 (아직 문제 아님)"),
     "C": ("## 화면에서 확인되는 사실", "## 비교 관점 해석 (아직 문제 아님)"),
+    "X": ("## 멘토가 말한 것 (들은 그대로)", "## 내 해석 (내 생각)"),
 }
 
 TYPE_NAME = {
     "O": "팀 관찰", "E": "외부 자료", "S": "화면 분석", "C": "경쟁 앱",
+    "X": "전문가 확인",
     "H": "가설", "P": "검증된 문제", "SOL": "개선안", "M": "측정 결과",
 }
 

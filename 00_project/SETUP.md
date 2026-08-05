@@ -30,8 +30,11 @@
 | 카드 작성 절차 (공통) | `.claude/skills/evidence-card/` | 이 문서 5-1절은 참조 |
 | 화면 분석 절차 · 경쟁사 절차 | 해당 `.claude/agents/*.md` | Skill로 빼지 않는다 (5절 기준) |
 | 캡처 폴더 · 파일명 · 형식 | `CLAUDE.md` "캡처 파일" | HOWTO 3-4·3-5는 조작법만 |
+| 멘토 확인 규칙 | `CLAUDE.md` "멘토 확인" | `_meta/mentor/README.md`·HOWTO 4-6은 쉬운 말 설명 |
+| 멘토 회의 준비 절차 | `.claude/agents/mentor-liaison.md` | Skill로 빼지 않는다 (5절 기준) |
 | Gate 통과 기준 | `PROJECT_PLAN.md` | `/gate1` `/gate2`는 읽어서 제시 |
 | 일정 · 역할 · 용어 | `PROJECT_PLAN.md` | 참조만 |
+| 팀원 첫날 안내 | `00_project/START_HERE.md` | HOWTO·PROJECT_PLAN을 가리키기만 한다 |
 
 **수동 동기화가 필요한 곳은 한 군데뿐입니다** — `.gitignore`는 파이썬을 import 할 수
 없으므로 `scripts/paths.py`의 사본입니다. 양쪽 주석에 그렇게 적어뒀습니다.
@@ -67,9 +70,10 @@ HOWTO 3절 대역표에 그렇게 해뒀습니다.
 | 4 | `evidence-card` Skill + `build_index.py` | ✅ 완료 |
 | 5 | 경로 검사 · 추적성 검사 · Gate 커맨드 | ✅ 완료 |
 | 6 | 리서치 agent 3개 + red-team-auditor + synthesizer | ✅ 완료 |
-| 7 | `survey-designer` `data-analyst` + Skill 2개 | ⬜ 8/19~8/28 |
+| 7 | `mentor-liaison` agent + X 카드 + 게이트 기록 검사 | ✅ 완료 |
+| 8 | `survey-designer` `data-analyst` + Skill 2개 | ⬜ 설문 설계·회수 전까지 |
 
-6·7번의 날짜별 배치는 `architecture_review.md` 4절 표를 따릅니다.
+8번의 배치는 `architecture_review.md` 4절 표를 따릅니다.
 
 ---
 
@@ -302,7 +306,7 @@ Personalization / Accessibility / 콘텐츠 구조) · 2단 분리 서식 ·
 `.claude/agents/competitor-analyst.md` 안에 있습니다. 이유는 5-2와 같습니다.
 
 agent 안에 들어 있는 것:
-User Task 5개(T01~T05) · 캡처 파일명 규칙 `{앱}_{T##}_{step##}.png` ·
+User Task 5개(T01~T05) · 캡처 파일명 규칙 `{앱}_{T##}_{step##}_{YYYYMMDD}.png` ·
 근거 등급 적용(기준의 정본은 `CLAUDE.md` 절대 규칙 6번, D등급은 카드 생성 금지) ·
 Task별 비교표 형식 · 우열 판정 금지.
 
@@ -457,7 +461,7 @@ PROJECT_PLAN W1이 순서를 뒤집은 이유가 이것입니다 — **사람이
 **정본은 `scripts/traceability_check.py`입니다.** 아래 표는 목록일 뿐이며, 검사를
 추가·수정할 때는 스크립트를 고칩니다.
 
-### 검사 항목 (13개)
+### 검사 항목 (18개)
 
 | # | 검사 | 심각도 |
 |---|---|---|
@@ -467,13 +471,23 @@ PROJECT_PLAN W1이 순서를 뒤집은 이유가 이것입니다 — **사람이
 | 4 | `pain_point` 필드가 없거나 존재하지 않는 P를 가리키는 SOL 카드 | ERROR |
 | 5 | 출처 4요소가 빠진 E 카드 | ERROR |
 | 6 | 어떤 H에도 인용되지 않은 근거 카드 (고아) | WARN |
-| 7 | 근거 등급 D인 C 카드가 존재 | WARN |
+| 7 | 근거 등급 D인 카드가 존재 (E·C 공통) | WARN |
 | 8 | ID 중복·형식 오류 | ERROR |
 | 9 | ID 대역 위반 — O·E·S·C·SOL만 대상. **H·P·M은 대역이 없으므로 제외** | WARN |
 | 10 | M 카드 스키마 — `solution`·`pain_point`·`metric`·`baseline`·`result` | ERROR |
 | 11 | S 카드 스키마 — `screen`·`captured` | ERROR |
 | 12 | 공통 필수 필드 — `type`·`author`·`date`·`summary` | ERROR |
 | 13 | C 카드 스키마 — `app`·`user_task`·`grade`·`capture`·`captured` | ERROR |
+| 14 | X 카드 스키마 — `answer_type`·`confidential` 값이 정해진 것인가 | ERROR |
+| 15 | 멘토 의견(`opinion`)을 H·SOL의 근거로 인용 | ERROR |
+| 16 | 카드가 정해진 폴더 밖에 있음 (P는 `04_painpoint/`, M은 `07_usertest/measurement/`) | ERROR |
+| 17 | 캡처가 `01_evidence/screens/` 밖이거나, 파일이 없거나, PNG/JPG가 아님 | ERROR |
+| 18 | P·M 카드가 게이트 기록(`_meta/gate1_record.md`·`gate2_record.md`)에 없음 | ERROR |
+
+**#15는 초안(`draft/`)에서도 ERROR입니다 — 일부러 그렇습니다.**
+다른 지적은 초안이면 WARN으로 낮춥니다. 초안은 아직 회의를 통과하지 않았으니
+필드가 비어 있는 것이 정상이기 때문입니다. 그런데 멘토 의견을 근거로 삼은 것은
+**미완성이 아니라 규칙 위반**이고, 회의에 들고 가기 전에 고쳐야 합니다.
 
 필수 필드 목록의 정본은 `scripts/cards.py`의 `EXTRA_FIELDS`이고,
 문서 쪽 정본은 `CLAUDE.md`다. 검사 스크립트는 그 표를 읽어 쓸 뿐 목록을 따로 갖지 않는다.
@@ -543,11 +557,11 @@ ERROR가 1건이라도 있으면 exit code 1을 반환합니다.
 
 ### 8/5(수) — 킥오프
 - [ ] 팀원 3명 접근 권한 부여
-- [ ] **킥오프에서 O 카드 마감(8/7 오전)을 못박기**
+- [ ] **킥오프에서 O 카드 순서를 못박기 — 리서치 도우미보다 먼저**
 - [ ] **팀원3과 함께 `/start` → O 카드 작성 → `/save` 1회 실습**
 - [ ] `_meta/decision_log.md`, `source_wishlist.md` 생성
 
-### 8/7(금) 오전 — 오후 리서치 개시 조건
+### 리서치 개시 전 확인 조건
 - [x] agent 3개: `desk-researcher` `screen-analyst` `competitor-analyst`
       (Skill 2개는 만들지 않음 — 5-2·5-3절 참고)
 - [ ] `/audit` 1회 시범 실행
@@ -574,7 +588,7 @@ Research Rule을 Skill에 넣으면 로드 안 될 때 규칙이 무시됩니다
 **규칙을 두 곳에 적지 마세요.** 0절 정본 표를 먼저 보고, 정본에만 적으세요.
 사본은 반드시 어긋나고, 어긋난 뒤에는 어느 쪽이 맞는지 아무도 모릅니다.
 이 문서 자체가 한 번 그렇게 어긋났습니다 — `CLAUDE.md` 초안을 여기 복사해 둔 탓에
-실제 파일과 8곳이 달라졌고, 그 상태로 8/7 agent를 만들었다면 틀린 설계를 그대로
+실제 파일과 8곳이 달라졌고, 그 상태로 agent를 만들었다면 틀린 설계를 그대로
 옮겼을 것입니다.
 
 **`.gitignore`만은 수동 동기화입니다.** 파이썬을 import 할 수 없어 어쩔 수 없습니다.

@@ -18,7 +18,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cards import ROOT, card_num, card_type, load_cards  # noqa: E402
 
 OUT = ROOT / "01_evidence" / "index.csv"
-COLUMNS = ["id", "type", "author", "date", "source_org", "grade", "file_path", "summary"]
+# answer_type 은 X 카드 전용이다. synthesizer 가 카드를 열지 않고도
+# 멘토 "의견"을 근거에서 걸러낼 수 있어야 하므로 목록에 싣는다.
+COLUMNS = ["id", "type", "author", "date", "source_org", "grade",
+           "answer_type", "file_path", "summary"]
 
 
 def main():
@@ -39,6 +42,7 @@ def main():
                     fm.get("date", ""),
                     fm.get("source_org", ""),
                     fm.get("grade", ""),
+                    fm.get("answer_type", ""),
                     c["path"],
                     fm.get("summary", ""),
                 ]

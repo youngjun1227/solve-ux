@@ -14,13 +14,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cards import (  # noqa: E402
-    BANDS, BAND_EXEMPT_TYPES, EVIDENCE_DIR, card_num, card_type, load_cards,
+    BANDS, BAND_EXEMPT_TYPES, ISSUABLE_DIR, card_num, card_type, load_cards,
 )
 
 
 def main(argv):
     if len(argv) != 2:
-        print("사용법: python3 scripts/next_id.py <종류 O|E|S|C> <이름 팀장|팀원1|팀원2|팀원3>")
+        kinds = "|".join(ISSUABLE_DIR)
+        print(f"사용법: python3 scripts/next_id.py <종류 {kinds}> <이름 {'|'.join(BANDS)}>")
         return 2
 
     t, author = argv[0].upper(), argv[1].strip()
@@ -28,8 +29,8 @@ def main(argv):
     if t in BAND_EXEMPT_TYPES:
         print(f"{t} 카드는 대역이 없습니다. 회의에서 001부터 순번으로 발급합니다.")
         return 2
-    if t not in EVIDENCE_DIR:
-        print(f"모르는 카드 종류입니다: {t} (O, E, S, C 중 하나)")
+    if t not in ISSUABLE_DIR:
+        print(f"모르는 카드 종류입니다: {t} ({', '.join(ISSUABLE_DIR)} 중 하나)")
         return 2
     if author not in BANDS:
         print(f"모르는 이름입니다: {author} ({', '.join(BANDS)} 중 하나)")
@@ -40,7 +41,7 @@ def main(argv):
 
     used = [
         card_num(c["id"])
-        for c in load_cards(["01_evidence"])
+        for c in load_cards([ISSUABLE_DIR[t]])
         if card_type(c["id"]) == t and lo <= (card_num(c["id"]) or -1) <= hi
     ]
     nxt = (max(used) + 1) if used else lo + 1
@@ -50,7 +51,7 @@ def main(argv):
         return 1
 
     print(f"{t}-{nxt}")
-    print(f"  파일 위치: {EVIDENCE_DIR[t]}/{t}-{nxt}.md", file=sys.stderr)
+    print(f"  파일 위치: {ISSUABLE_DIR[t]}/{t}-{nxt}.md", file=sys.stderr)
     return 0
 
 

@@ -10,7 +10,7 @@ python3 scripts/traceability_check.py
 
 발표 부록으로 쓸 사본까지 남기려면 `--save`를 붙인다.
 (`_meta/traceability.md`는 저장소에 올라가지 않는다. 날짜가 붙은 사본만 올라간다.
-Gate 직전과 9/17 최종 실행은 `--save`로 돌린다.)
+Gate 직전과 발표 전 최종 실행은 `--save`로 돌린다.)
 
 결과를 심각도순으로 한국어로 요약한다. ERROR가 있으면 Gate를 통과할 수 없다.
 
@@ -34,4 +34,4 @@ ID 중복 · ID 대역 위반
 
 ## 운영
 
-주 1회(일요일) · 각 Gate 직전 · 9/17 최종. Gate 직전과 최종은 `--save`.
+주 1회(일요일) · 각 Gate 직전 · 발표 전 최종. Gate 직전과 최종은 `--save`.
