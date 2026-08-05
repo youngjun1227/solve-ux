@@ -62,6 +62,14 @@ python3 scripts/check_commit_paths.py --all
 
 이름은 카드의 `author` 필드에서 가져온다. 알 수 없으면 사람에게 묻는다.
 
+### ⛔ Co-Authored-By 를 붙이지 않는다
+
+**커밋 메시지에 `Co-Authored-By: Claude ...` 를 넣지 마라.**
+`Generated with Claude Code` 같은 문구도 넣지 마라.
+메시지는 위 한 줄 형식과 필요하면 본문 설명까지다. 그게 전부다.
+
+`CLAUDE.md` "커밋" 절 규칙이며, 기본 동작보다 이 규칙이 우선한다.
+
 ## 4. 올리기 전 확인 — 건너뛰지 않는다
 
 `git add` 한 뒤, **커밋하기 전에** 다음을 보여주고 확인을 받는다.

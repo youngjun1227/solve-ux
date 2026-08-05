@@ -27,6 +27,7 @@
 | 카드 상수 (대역·필드·본문 구조) | `scripts/cards.py` | 문서 쪽 원본은 `CLAUDE.md` |
 | 기계 검사 항목 | `scripts/traceability_check.py` | 이 문서 7절은 목록만 |
 | 커밋 메시지 규칙 | `.claude/commands/save.md` | 이 문서 2절은 참조 |
+| Co-Authored-By 금지 | `CLAUDE.md` "커밋" | `/save`는 참조. 모든 커밋 경로에 적용 |
 | 카드 작성 절차 (공통) | `.claude/skills/evidence-card/` | 이 문서 5-1절은 참조 |
 | 화면 분석 절차 · 경쟁사 절차 | 해당 `.claude/agents/*.md` | Skill로 빼지 않는다 (5절 기준) |
 | 캡처 폴더 · 파일명 · 형식 | `CLAUDE.md` "캡처 파일" | HOWTO 3-4·3-5는 조작법만 |

@@ -132,6 +132,21 @@
 - 번호가 없는 공용 파일(_meta/decision_log.md, 08_deliverable/outline.md 등)은
   팀 회의 중에만 수정한다.
 
+## 커밋 — Claude를 기여자로 넣지 않는다
+
+**커밋 메시지에 `Co-Authored-By: Claude ...` 트레일러를 넣지 않는다.**
+어떤 경로로 커밋하든 마찬가지다 — `/save`로 하든, 사람이 직접 시키든.
+`Generated with Claude Code` 같은 문구도 넣지 않는다.
+
+- 이 저장소의 커밋 작성자는 팀원 4명뿐이다. 도구는 기여자가 아니다.
+- 넣으면 GitHub 커밋과 기여자 목록에 Claude가 사람처럼 표시된다.
+  학교 프로젝트 산출물이라 그렇게 보이면 안 된다.
+- **AI를 어디에 썼는지는 다른 곳에 기록한다** — `_meta/decision_log.md`와
+  발표 자료 "AI를 쓴 범위"(`08_deliverable/limitations.md`)가 그 자리다.
+  숨기려는 것이 아니라 적을 곳이 따로 있다는 뜻이다.
+
+커밋 메시지 형식은 `.claude/commands/save.md`가 정본이다.
+
 ## 개인정보 — 커밋 경로 화이트리스트
 
 - 커밋해도 되는 경로의 정의처는 scripts/paths.py 하나다.
