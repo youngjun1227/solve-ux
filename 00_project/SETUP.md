@@ -307,7 +307,9 @@ Personalization / Accessibility / 콘텐츠 구조) · 2단 분리 서식 ·
 `.claude/agents/competitor-analyst.md` 안에 있습니다. 이유는 5-2와 같습니다.
 
 agent 안에 들어 있는 것:
-User Task 5개(T01~T05) · 캡처 파일명 규칙 `{앱}_{T##}_{step##}_{YYYYMMDD}.png` ·
+User Task 5개(T01~T05) · 캡처 파일명 규칙
+`{앱}_{저니번호}_{화면이름}_{순번}_{YYYYMMDD}.{png|jpg}` (파일명에 T 번호가 없으므로
+기록지·캡처 README를 읽어 T와 잇는다) ·
 근거 등급 적용(기준의 정본은 `CLAUDE.md` 절대 규칙 6번, D등급은 카드 생성 금지) ·
 Task별 비교표 형식 · 우열 판정 금지.
 

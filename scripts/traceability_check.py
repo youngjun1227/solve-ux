@@ -99,22 +99,26 @@ def run_checks(cards):
 
         # 17 — 캡처 파일이 실제로 있는가. 형식이 읽을 수 있는가.
         # 경로 오타나 HEIC 는 사람이 카드를 볼 때까지 드러나지 않는다.
+        # 한 카드가 캡처를 여러 장 인용하는 것이 보통이므로 목록으로 올 수 있다.
+        # 한 장씩 따로 본다 — 한 장만 잘못돼도 그 장을 짚어줘야 고칠 수 있다.
         cap_key = CAPTURE_FIELD.get(t)
         if cap_key and fm.get(cap_key):
-            cap = str(fm[cap_key]).strip()
-            if not cap.startswith(CAPTURE_HOME):
-                f.append((
-                    lvl, 17, p,
-                    f"캡처는 {CAPTURE_HOME} 안에 두어야 합니다 (현재: {cap})",
-                ))
-            elif not (ROOT / cap).exists():
-                f.append((lvl, 17, p, f"{cap_key} 가 가리키는 파일이 없습니다: {cap}"))
-            elif not cap.lower().endswith(CAPTURE_SUFFIXES):
-                f.append((
-                    lvl, 17, p,
-                    f"캡처 형식이 PNG/JPG 가 아닙니다: {cap}"
-                    " — HEIC 등은 열 수 없습니다",
-                ))
+            raw = fm[cap_key]
+            caps = raw if isinstance(raw, list) else [raw]
+            for cap in [str(c).strip() for c in caps if str(c).strip()]:
+                if not cap.startswith(CAPTURE_HOME):
+                    f.append((
+                        lvl, 17, p,
+                        f"캡처는 {CAPTURE_HOME} 안에 두어야 합니다 (현재: {cap})",
+                    ))
+                elif not (ROOT / cap).exists():
+                    f.append((lvl, 17, p, f"{cap_key} 가 가리키는 파일이 없습니다: {cap}"))
+                elif not cap.lower().endswith(CAPTURE_SUFFIXES):
+                    f.append((
+                        lvl, 17, p,
+                        f"캡처 형식이 PNG/JPG 가 아닙니다: {cap}"
+                        " — HEIC 등은 열 수 없습니다",
+                    ))
 
         # 7 — 근거 등급 D. grade 를 갖는 종류 전부에 적용한다(CLAUDE.md 규칙 6).
         # 예전에는 C 카드만 봤다. E 카드도 grade 를 필수로 요구하므로

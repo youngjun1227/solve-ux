@@ -26,6 +26,12 @@ RESTRICTED_ROOTS = {
     "07_usertest": {"protocol", "anonymized", "analysis", "measurement"},
 }
 
+# 팀원이 보낸 캡처를 마스킹 전에 풀어두는 임시 폴더. 통째로 커밋 금지.
+# 2026-08-13 토스 캡처 정리 때 이 폴더의 원본(실명·생년월일·전화번호가
+# 찍힌 화면)이 경로 검사에서 "허용"으로 분류되는 것이 발견되어 막았다.
+# 마스킹이 끝난 사본만 01_evidence/screens/ 로 옮겨 커밋한다.
+STAGING_ROOTS = {"picture"}
+
 # 위 폴더의 차단 구역에서도 유일하게 허용되는 파일.
 # 폴더 자체는 저장소에 남아야 팀원이 원본을 어디 둘지 안다.
 KEEPFILE = ".gitkeep"
@@ -108,6 +114,11 @@ def classify(path: str):
             return BLOCK, f"개인정보로 보이는 파일명 패턴 ('{sub}')"
 
     root = parts[0]
+    if root in STAGING_ROOTS:
+        return BLOCK, (
+            f"{root}/ 는 마스킹 전 캡처 임시 폴더 — 커밋 금지. "
+            "마스킹 끝난 사본만 01_evidence/screens/ 로 옮긴다"
+        )
     if root in RESTRICTED_ROOTS:
         allowed = RESTRICTED_ROOTS[root]
         if name == KEEPFILE:
@@ -165,6 +176,8 @@ def explain_ignored(path: str):
         return EXPECTED, "녹화·녹음 파일은 저장소에 올리지 않습니다", None
 
     root = parts[0]
+    if root in STAGING_ROOTS:
+        return EXPECTED, "마스킹 전 캡처 원본이라 일부러 올리지 않습니다 (개인정보 보호)", None
     if root in RESTRICTED_ROOTS:
         allowed = ", ".join(f"{root}/{d}/" for d in sorted(RESTRICTED_ROOTS[root]))
         if len(parts) >= 2 and parts[1] == "raw":

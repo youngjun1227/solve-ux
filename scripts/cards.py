@@ -146,12 +146,30 @@ def parse_front_matter(text):
     if end == -1:
         return {}
     data = {}
+    last_key = None
     for line in text[3:end].splitlines():
         line = line.split("#")[0].rstrip()
-        if not line.strip() or ":" not in line:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        # 여러 줄로 쓴 목록 — `capture:` 다음 줄부터 `  - 값` 이 이어지는 형태.
+        # C 카드는 캡처를 여러 장 인용하는 것이 보통이라 이 형식이 실제로 쓰인다
+        # (competitor-analyst agent 의 예시도 이 형식이다). 이것을 못 읽으면
+        # 값이 멀쩡히 있는데도 "필수 필드 누락"으로 잡힌다.
+        if stripped.startswith("- ") and last_key is not None:
+            prev = data.get(last_key)
+            if prev is None or isinstance(prev, list):
+                if not isinstance(prev, list):
+                    data[last_key] = []
+                v = stripped[2:].strip().strip("'\"")
+                if v:
+                    data[last_key].append(v)
+                continue
+        if ":" not in line:
             continue
         key, _, val = line.partition(":")
         key, val = key.strip(), val.strip()
+        last_key = key
         if val.startswith("[") and val.endswith("]"):
             items = [v.strip().strip("'\"") for v in val[1:-1].split(",")]
             data[key] = [v for v in items if v]
