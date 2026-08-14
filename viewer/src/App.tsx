@@ -4,6 +4,7 @@ import CardPage from './pages/CardPage'
 import DirectionsPage from './pages/DirectionsPage'
 import EvalSheetPage from './pages/EvalSheetPage'
 import RecordSheetPage from './pages/RecordSheetPage'
+import SurveyPage from './pages/SurveyPage'
 import { cards } from './lib/cards'
 
 export default function App() {
@@ -27,6 +28,9 @@ export default function App() {
             <NavLink to="/record-sheet" className="nav-link">
               개인 기록지
             </NavLink>
+            <NavLink to="/survey" className="nav-link">
+              설문지
+            </NavLink>
           </nav>
         </div>
         <span className="masthead-note">근거 카드 {cards.length}장 · 읽기 전용</span>
@@ -36,6 +40,7 @@ export default function App() {
         <Route path="/directions" element={<DirectionsPage />} />
         <Route path="/eval-sheet" element={<EvalSheetPage />} />
         <Route path="/record-sheet" element={<RecordSheetPage />} />
+        <Route path="/survey" element={<SurveyPage />} />
         <Route path="/card/:id" element={<CardPage />} />
       </Routes>
     </div>
