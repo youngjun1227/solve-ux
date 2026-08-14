@@ -45,16 +45,15 @@ const finals = toDocs(finalModules, '03_validation/design')
 const drafts = toDocs(draftModules, '03_validation/design')
 const audits = toDocs(auditModules, '_meta')
 
-// 8/21 배포까지의 관문. PROJECT_PLAN 4-1절 고정 날짜는 8/21 하나뿐이고
-// 나머지는 그 앞에 놓인 잠정 일정이다 — 그렇게 표시한다.
-// 8/15에 폼이 확정되면서 문항 확정(8/19 예정)이 앞당겨 끝났다.
+// 설문의 관문 일정. 8/15 일정 전면 개편(PROJECT_PLAN 버전 2.0) 반영:
+// 고정 날짜는 8/15 오후 배포 · 8/19 마감 (그리고 9/11 테스트) — 나머지는 잠정.
 const GATES = [
   { date: '8/13', label: '초안 작성 · 1차 감사', fixed: false, done: true },
   { date: '8/14', label: '2차 감사 · 반영', fixed: false, done: true },
-  { date: '8/15', label: '폼 제작 · 문항 확정', fixed: false, done: true },
-  { date: '8/17', label: '가설 확정 회의', fixed: false, done: false },
-  { date: '8/20', label: '파일럿 3명', fixed: false, done: false },
-  { date: '8/21', label: '배포', fixed: true, done: false },
+  { date: '8/15', label: '폼 확정 · 오후 배포', fixed: true, done: false },
+  { date: '8/17', label: '응답 중간 점검', fixed: false, done: false },
+  { date: '8/19', label: '설문 마감', fixed: true, done: false },
+  { date: '8/25', label: '종합 회의 — H 확정 · Gate 1 (신한라이프 본사 17시)', fixed: true, done: false },
 ]
 
 export default function SurveyPage() {
@@ -88,17 +87,17 @@ export default function SurveyPage() {
   return (
     <div className="page">
       <p className="directions-intro">
-        8/21에 배포할 <strong>설문지</strong>와 그 이력(초안·감사 보고서)입니다.
+        8/15 오후에 배포하는 <strong>설문지</strong>와 그 이력(초안·감사 보고서)입니다.
         문항은 전부 가설(H)에 묶여 있고, 각 문항에는 <strong>반증 조건</strong>이 붙어 있습니다 —
         그런 답이 나오면 우리 판단이 틀린 것입니다.
         <strong> 수정은 파일에 하고, 이 화면은 읽기용입니다.</strong>
       </p>
 
       <div className="survey-warn ok">
-        <strong>최종본 확정 (8/15).</strong> 실제 구글폼이 제작됐고, 정본은{' '}
+        <strong>최종본 확정 (8/15) — 오늘 오후 배포.</strong> 실제 구글폼이 제작됐고, 정본은{' '}
         <code>survey_deploy_20260814.md</code>(6차 — 폼과 동기화)입니다. 초안·감사 탭은
-        이력 보존용이며 문항 번호가 최종본과 다릅니다. 남은 작업: 시안 이미지([IMG-2])
-        · 링크 2개 · 페이지 3 이후 대조 · 8/20 파일럿.
+        이력 보존용이며 문항 번호가 최종본과 다릅니다. 배포 전 마무리: 시안 이미지([IMG-2])
+        · 링크 2개 · 페이지 3 이후 대조 · 전 경로 통과 확인. 마감은 8/19(수)입니다.
       </div>
 
       <ol className="survey-gates" aria-label="배포까지 남은 관문">
